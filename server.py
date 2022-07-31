@@ -45,12 +45,50 @@ def save_video_into_db():
     ps = PromptUtils(Screen())
     items = list(range(0, 57))
 
-    # A Nicer, Single-Call Usage
+    record = Media(metainfo=json.dumps(video_info), url=video_url, type='video')
+    controller.insert(record)
+
     for item in progressBar(ps, items, prefix = 'Progress:', suffix = 'Complete', length = 50):
-        # Do stuff...
+        # uploading video file to youtube is out of this scope, so I only use fake codes here. :-(
         time.sleep(0.1)
+    
+    ps.println("\033[1;32mThe video information is successfully saved into database!\033[0m")
     ps.enter_to_continue()
 
+
+def update():
+    ps = PromptUtils(Screen())
+    id = int(
+            ps.input("\033[1;32mEnter the ID of video entry to be edited\033[0m").input_string)
+    record = controller.get_video_by_id(id)
+
+    ps.println(record.as_dict())
+    duration = int(
+            ps.input("Enter new duration").input_string)
+
+    # replace the duration with new value
+    metainfo_json = json.loads(record.metainfo) # convert string to json object
+    metainfo_json['duration'] = duration
+    record.metainfo = json.dumps(metainfo_json) # convert json object to string
+
+    # update video entry
+    controller.update(record)
+
+    ps.enter_to_continue()
+
+
+def delete_video():
+    ps = PromptUtils(Screen())
+    id = int(
+            ps.input("\033[1;32mEnter the ID of video entry to be deleted\033[0m").input_string)
+    record = controller.get_video_by_id(id)
+    if record is not None:
+        controller.delete(record)
+        ps.println("The video entry is deleted!")
+    else:
+        ps.println("The ID doesn't exist in DB!")
+
+    ps.enter_to_continue()
 
 def retrive_video_info_from_db():
     ps = PromptUtils(Screen())
@@ -58,7 +96,7 @@ def retrive_video_info_from_db():
     metainfo = video.metainfo
     url = video.url 
 
-    # anaylyze the data via JSON library
+    # retrieve the details data of metainfo column  via JSON library
     metainfo_json = controller.convert_metainfo_to_json(metainfo)
     ps.println("\033[1;32mvideo information:\033[0m")
     ps.println('bit_rate: ' + metainfo_json['bit_rate'])
@@ -78,7 +116,9 @@ def retrive_video_info_from_db():
 option_dict = {
     "read video information": read_video_meta,
     "Save video information into database and upload it to youtube": save_video_into_db,
-    "Retrieve video information from database ": retrive_video_info_from_db
+    "Retrieve video information from database ": retrive_video_info_from_db,
+    "Update video information": update,
+    "Delete a video information": delete_video
 }
 
 

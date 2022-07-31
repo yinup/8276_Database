@@ -14,11 +14,41 @@ class Controller:
         Session.configure(bind=engine, future=True)
         self.session = Session()
     
-    def save(self, media):
+    def insert(self, media):
+        """insert a media into database
+
+        Args:
+            media: an object of table media
+        """        
         if media is not None:
             self.session.add(media)
+            self.session.commit()
+
+    def update(self, media):
+        """insert a media into database
+
+        Args:
+            media: an object of table media
+        """        
+        if media is not None:
+            self.session.commit()
+
+    def delete(self, media):
+        """insert a media into database
+
+        Args:
+            media: an object of table media
+        """        
+        if media is not None:
+            self.session.delete(media)
+            self.session.commit()
 
     def get(self):
+        """get a record from media table
+
+        Returns:
+            ret: an object of Class/table media
+        """        
         ret = self.session.query(Media).first()
         return ret
 
@@ -26,3 +56,13 @@ class Controller:
         metainfo_json = json.loads(json_string)
 
         return metainfo_json
+
+    
+    def get_video_by_id(self, id):
+        """get a record by id from media table
+
+        Returns:
+            ret: an object of Class/table media
+        """     
+        ret = self.session.query(Media).filter(Media.id == id).first()
+        return ret

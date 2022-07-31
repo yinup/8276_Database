@@ -37,6 +37,8 @@ video_info = {
    "time_base":"1/12288",
 }
 
+video_url = 'https://www.youtube.com/watch?v=tMBKbyDzGD8'
+
 class BaseModel():
 
     def __repr__(self) -> str:
